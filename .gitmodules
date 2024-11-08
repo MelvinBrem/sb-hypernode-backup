@@ -1,0 +1,3 @@
+[submodule "include/include/progress-bar.sh"]
+	path = include/include/progress-bar.sh
+	url = https://github.com/edouard-lopez/progress-bar.sh
