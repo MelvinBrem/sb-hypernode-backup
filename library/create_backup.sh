@@ -1,14 +1,12 @@
+source .env
+
+echo $ENV_DBNAME
+exit
+
 VAR_DATETIME="$(date +%Y-%m-%d_%H-%M)"
 VAR_BACKUPDIR="~/sb_backups/backup_${VAR_DATETIME}"
 
 cd ~
-
-if [ ! -e './scripts/.env' ]; then
-    printf "${COLOR_RED}No .env file found${COLOR_DEFAULT_TEXT}\n"
-    exit
-else
-    . ./scripts/.env
-fi
 
 if [ -z "${ENV_DBNAME}" ]; then
     printf "${COLOR_RED}No ENV_DBNAME value set in .env${COLOR_DEFAULT_TEXT}\n"

@@ -11,3 +11,9 @@ ssh app@[environment_name].hypernode.io
 ```sh
 git clone --recurse-submodules [repo_url]
 ```
+
+<b>Run the script</b>
+
+```sh
+cd sb-hypernode-backup && bash sb_hypernode_backup.sh
+```
