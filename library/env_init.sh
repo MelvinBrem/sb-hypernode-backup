@@ -23,19 +23,19 @@ if [ ! -e './.env' ]; then
         if [ -f "$WPCONFIG_FILE" ]; then
             WPCONFIG_DBNAME=$(grep "define('DB_NAME'," "$WPCONFIG_FILE" | sed -E "s/define\('DB_NAME', '([^']+)'\);/\1/")
             if [ -n "$WPCONFIG_DBNAME" ]; then
-            printf "${COLOR_BLUE}Database name found in wp-config.php: $WPCONFIG_DBNAME${COLOR_DEFAULT_TEXT}\n"
-            WPCONFIG_ENV_DBNAME="$WPCONFIG_DBNAME"
+                printf "${COLOR_BLUE}Database name found in wp-config.php: $WPCONFIG_DBNAME${COLOR_DEFAULT_TEXT}\n"
+                WPCONFIG_ENV_DBNAME="$WPCONFIG_DBNAME"
             else
-            printf "${COLOR_RED}Database name not found in wp-config.php${COLOR_DEFAULT_TEXT}\n"
+                printf "${COLOR_RED}Database name not found in wp-config.php${COLOR_DEFAULT_TEXT}\n"
             fi
         else
             printf "${COLOR_RED}wp-config.php not found in the given directory${COLOR_DEFAULT_TEXT}\n"
-            exit
+            exit 1
         fi
 
         printf "${COLOR_ORANGE}Database name [${WPCONFIG_ENV_DBNAME}]: ${COLOR_DEFAULT_TEXT}"
         read -r RESP_ENV_DBNAME
-        RESP_ENV_BACKUPDIR=${RESP_ENV_BACKUPDIR:-WPCONFIG_ENV_DBNAME}
+        RESP_ENV_DBNAME=${RESP_ENV_DBNAME:-$WPCONFIG_ENV_DBNAME}
 
         # Set ENV_BACKUPDIR
         printf "${COLOR_ORANGE}Directory to store backups: [./../sb-backups]: ${COLOR_DEFAULT_TEXT}"
@@ -55,7 +55,7 @@ if [ ! -e './.env' ]; then
         fi
         ;;
     *)
-        exit
+        exit 1
         ;;
 esac
 fi
