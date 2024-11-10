@@ -5,21 +5,30 @@ if [ ! -e './.env' ]; then
     case "$RESPONSE" in
     [yY][eE][sS]|[yY])
 
+        DEFAULT_WPDIR=$(cd "./../public" && pwd)
+        DEFAULT_DBNAME=""
+        DEFAULT_BACKUPDIR=$(cd "./../sb_backups" && pwd)
+
         # Set ENV_WPDIR
         while true; do
-            printf "${COLOR_ORANGE}Wordpress directory: [./../public]: ${COLOR_DEFAULT_TEXT}"
-            read -r RESP_ENV_WPDIR
-            RESP_ENV_WPDIR=${RESP_ENV_WPDIR:-./../public}
+            printf "${COLOR_ORANGE}Wordpress directory: [${DEFAULT_WPDIR}]: ${COLOR_DEFAULT_TEXT}"
+            read -r ENV_WPDIR
+            ENV_WPDIR=${ENV_WPDIR:-${DEFAULT_WPDIR}}
 
-            if [ -d "$RESP_ENV_WPDIR/wp-content" ]; then
+            if [ -d "${ENV_WPDIR}/wp-content" ]; then
                 break
                 else
                 printf "${COLOR_RED}The given directory is not a Wordpress installation${COLOR_DEFAULT_TEXT}\n"
             fi
         done
 
+        # Set ENV_BACKUPDIR
+        printf "${COLOR_ORANGE}Directory to store backups: [${DEFAULT_BACKUPDIR}]: ${COLOR_DEFAULT_TEXT}"
+        read -r ENV_BACKUPDIR
+        ENV_BACKUPDIR=${ENV_BACKUPDIR:-${DEFAULT_BACKUPDIR}}
+
         # Set ENV_DBNAME
-        WPCONFIG_FILE="${RESP_ENV_WPDIR}/wp-config.php"
+        WPCONFIG_FILE="${ENV_WPDIR}/wp-config.php"
         if [ -f "$WPCONFIG_FILE" ]; then
             WPCONFIG_DBNAME=$(grep "define('DB_NAME'," "$WPCONFIG_FILE" | sed -E "s/define\('DB_NAME', '([^']+)'\);/\1/")
             if [ -n "$WPCONFIG_DBNAME" ]; then
@@ -32,20 +41,15 @@ if [ ! -e './.env' ]; then
             printf "${COLOR_RED}wp-config.php not found in the given directory${COLOR_DEFAULT_TEXT}\n"
             exit 1
         fi
-
         printf "${COLOR_ORANGE}Database name [${WPCONFIG_ENV_DBNAME}]: ${COLOR_DEFAULT_TEXT}"
-        read -r RESP_ENV_DBNAME
-        RESP_ENV_DBNAME=${RESP_ENV_DBNAME:-$WPCONFIG_ENV_DBNAME}
+        read -r ENV_DBNAME
+        ENV_DBNAME=${ENV_DBNAME:-$WPCONFIG_ENV_DBNAME}
 
-        # Set ENV_BACKUPDIR
-        printf "${COLOR_ORANGE}Directory to store backups: [./../sb-backups]: ${COLOR_DEFAULT_TEXT}"
-        read -r RESP_ENV_BACKUPDIR
-        RESP_ENV_BACKUPDIR=${RESP_ENV_BACKUPDIR:-./../sb_backups}
-
+        # Write to .env
         {
-            echo "ENV_DBNAME=\"$RESP_ENV_DBNAME\""
-            echo "ENV_BACKUPDIR=\"$RESP_ENV_BACKUPDIR\""
-            echo "ENV_WPDIR=\"$RESP_ENV_WPDIR\""
+            echo "ENV_WPDIR=\"${ENV_WPDIR}\""
+            echo "ENV_BACKUPDIR=\"${ENV_BACKUPDIR}\""
+            echo "ENV_DBNAME=\"${ENV_DBNAME}\""
         } > .env
 
         if [ $? -eq 0 ]; then
